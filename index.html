@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUELLQUALISER</title>
+  <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.344.0/lib/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tailwindcss-seo@2.2.19/dist/tailwind.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+    body { font-family: 'Space Mono', monospace; font-size: 11px; tracking: -0.05em; }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 8px; height: 14px;
+      background: #ffffff; cursor: pointer; border-radius: 0px;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 8px; height: 14px; background: #ffffff; cursor: pointer; border-radius: 0px; border: none;
+    }
+    input[type="range"].vertical {
+      writing-mode: vertical-lr; direction: rtl; appearance: slider-vertical;
+      width: 14px; height: 100px; background: transparent;
+    }
+    input[type="range"].vertical::-webkit-slider-thumb { width: 14px; height: 8px; background: #ffffff; }
+    input[type="range"].vertical::-moz-range-thumb { width: 14px; height: 8px; background: #ffffff; }
+  </style>
+</head>
+<body class="bg-black text-white selection:bg-zinc-800 h-screen w-screen overflow-hidden flex flex-col justify-between p-4">
+
+  <!-- TOP APP NAV BAR -->
+  <div class="h-12 border border-zinc-900 bg-zinc-950 flex items-center justify-between px-4 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+      <span class="font-bold tracking-widest text-[12px]">QUELLQUALISER</span>
+    </div>
+    <div class="text-[9px] uppercase font-bold tracking-widest text-zinc-500">
+      v1.0.0
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE LINK CONTAINER -->
+  <div class="flex-1 my-3 flex gap-3 overflow-hidden">
+    
+    <!-- LEFT CONTROL RACK (DSP OPTIONS Engine) -->
+    <div class="w-80 border border-zinc-900 bg-zinc-950 p-4 flex flex-col justify-between overflow-y-auto shrink-0">
+      <div class="flex flex-col gap-4">
+        
+        <!-- AUDIO INGESTION BAY -->
+        <div class="border border-zinc-800 p-3 bg-black">
+          <span class="block text-[8px] font-bold tracking-widest text-zinc-500 uppercase mb-2">Source</span>
+          <label class="block w-full border border-dashed border-zinc-700 hover:border-white p-4 text-center cursor-pointer transition">
+            <span id="upload-label" class="opacity-60 block font-bold">CHOOSE AUDIO FILE</span>
+            <span class="text-[9px] opacity-30 block mt-1">MP3, WAV, FLAC supported</span>
+            <input type="file" id="audio-picker" accept="audio/*" class="hidden">
+          </label>
+        </div>
+
+        <!-- TIMELINE CONTROL AND METRICS -->
+        <div class="border border-zinc-800 p-3 bg-black flex flex-col gap-2">
+          <span class="text-[8px] font-bold tracking-widest text-zinc-500 uppercase">Core Speed & Transposition</span>
+          <div>
+            <div class="flex justify-between text-[8px] font-bold text-zinc-400 mb-1">
+              <span>PLAYBACK SPEED / PITCH</span>
+              <span id="label-pitch">1.00x</span>
+            </div>
+            <input type="range" id="slider-pitch" min="0.5" max="2.0" step="0.01" value="1.0" class="w-full h-1 bg-zinc-900 appearance-none outline-none">
+          </div>
+        </div>
+
+        <!-- 5-BAND GRAPHIC EQUALIZER MATRIX -->
+        <div class="border border-zinc-800 p-3 bg-black flex flex-col gap-2">
+          <span class="text-[8px] font-bold tracking-widest text-zinc-500 uppercase">5-Band EQ Array</span>
+          <div class="h-32 border border-zinc-900 p-2 flex justify-between bg-zinc-950">
+            <div class="flex flex-col items-center justify-between w-1/5 h-full">
+              <span id="v-sub" class="text-[8px] font-bold opacity-60">0</span>
+              <div class="my-1"><input type="range" id="slider-sub" min="-15" max="15" step="1" value="0" class="vertical"></div>
+              <span class="text-[7px] font-bold opacity-40">60Hz</span>
+            </div>
+            <div class="flex flex-col items-center justify-between w-1/5 h-full">
+              <span id="v-low" class="text-[8px] font-bold opacity-60">0</span>
+              <div class="my-1"><input type="range" id="slider-low" min="-15" max="15" step="1" value="0" class="vertical"></div>
+              <span class="text-[7px] font-bold opacity-40">230Hz</span>
+            </div>
+            <div class="flex flex-col items-center justify-between w-1/5 h-full">
+              <span id="v-mid" class="text-[8px] font-bold opacity-60">0</span>
+              <div class="my-1"><input type="range" id="slider-mid" min="-15" max="15" step="1" value="0" class="vertical"></div>
+              <span class="text-[7px] font-bold opacity-40">910Hz</span>
+            </div>
+            <div class="flex flex-col items-center justify-between w-1/5 h-full">
+              <span id="v-high" class="text-[8px] font-bold opacity-60">0</span>
+              <div class="my-1"><input type="range" id="slider-high" min="-15" max="15" step="1" value="0" class="vertical"></div>
+              <span class="text-[7px] font-bold opacity-40">4kHz</span>
+            </div>
+            <div class="flex flex-col items-center justify-between w-1/5 h-full">
+              <span id="v-treb" class="text-[8px] font-bold opacity-60">0</span>
+              <div class="my-1"><input type="range" id="slider-treb" min="-15" max="15" step="1" value="0" class="vertical"></div>
+              <span class="text-[7px] font-bold opacity-40">14kHz</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRE-AMP ATTENUATOR MODULE -->
+      <div class="border border-zinc-800 p-3 bg-black mt-2">
+        <div class="flex justify-between text-[9px] font-bold opacity-70 mb-1">
+          <span>MASTER PRE-AMP</span>
+          <span id="label-preamp">0.0 dB</span>
+        </div>
+        <input type="range" id="slider-preamp" min="-12" max="12" step="0.5" value="0" class="w-full h-1 bg-zinc-900 appearance-none outline-none">
+      </div>
+    </div>
+
+    <!-- RIGHT VISUALISATION & EXPORT DESK -->
+    <div class="flex-1 border border-zinc-900 bg-zinc-950 p-5 flex flex-col justify-between overflow-hidden">
+      <div class="w-full flex-1 flex flex-col justify-center items-center relative bg-black border border-zinc-900 p-4 mb-4">
+        <canvas id="visualiser" class="w-full h-48 block"></canvas>
+        <div class="absolute top-3 left-3 text-[8px] font-bold tracking-widest text-zinc-600 uppercase">
+          Real-time Frequency Spectrum Analyzer
+        </div>
+      </div>
+
+      <!-- TIMELINE SLIDER RAIL -->
+      <div class="h-8 border border-zinc-900 bg-black px-4 flex items-center gap-3 mb-4">
+        <span id="time-current" class="text-[9px] text-zinc-500">0:00</span>
+        <input type="range" id="timeline" min="0" max="100" value="0" class="flex-1 h-1 bg-zinc-900 appearance-none outline-none cursor-pointer">
+        <span id="time-total" class="text-[9px] text-zinc-500">0:00</span>
+      </div>
+
+      <!-- MASTER EXPORT MANAGEMENT TERMINAL -->
+      <div class="border border-zinc-800 bg-black p-4 flex items-center justify-between">
+        <div class="flex flex-col">
+          <span class="font-bold text-zinc-200 uppercase" id="track-title-display">No Track Loaded</span>
+          <span class="text-[9px] text-zinc-500 uppercase mt-0.5" id="track-meta-display">Processing Pipeline Idle</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="btn-play" disabled class="h-10 border border-zinc-700 text-white font-bold uppercase px-6 opacity-30 hover:opacity-100 disabled:opacity-20 transition">Play Preview</button>
+          <button id="btn-download" disabled class="h-10 bg-white text-black font-bold uppercase px-6 disabled:opacity-20 transition flex items-center gap-2">
+            Compile & Download
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATUS ACTION FOOTER FOOTNOTE -->
+  <div class="h-6 text-[9px] text-zinc-600 font-bold uppercase tracking-widest flex items-center justify-between px-1">
+    <span>SYSTEM LOCK: CLIENT SIDE DSP CONSOLE</span>
+    <span id="status-logger">IDLE</span>
+  </div>
+
+  <!-- APPLICATION CONTROLLER AND WEB AUDIO IMPLEMENTATION -->
+  <script>
+    let audioContext = null;
+    let audioBuffer = null;
+    let audioSourceNode = null;
+    let currentFile = null;
+    
+    // Core Node Chains
+    let preampNode = null;
+    let biquadFilters = {};
+    let analyserNode = null;
+    
+    // Playback state parameters
+    let isPlaying = false;
+    let startTimeOffset = 0;
+    let timestampToCalculateOffset = 0;
+    let playbackRateValue = 1.0;
+
+    // DOM Links
+    const audioPicker = document.getElementById('audio-picker');
+    const uploadLabel = document.getElementById('upload-label');
+    const trackTitleDisplay = document.getElementById('track-title-display');
+    const trackMetaDisplay = document.getElementById('track-meta-display');
+    const btnPlay = document.getElementById('btn-play');
+    const btnDownload = document.getElementById('btn-download');
+    const statusLogger = document.getElementById('status-logger');
+    const timeline = document.getElementById('timeline');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+    const canvas = document.getElementById('visualiser');
+
+    // Setup Canvas
+    const canvasCtx = canvas.getContext('2d');
+    
+    // Initialize Web Audio API elements
+    function buildAudioRoutingGraph() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Prevent resetting node chains if they already exist
+      if (preampNode) return;
+
+      preampNode = audioContext.createGain();
+      analyserNode = audioContext.createAnalyser();
+      analyserNode.fftSize = 128;
+
+      const frequencies = { sub: 60, low: 230, mid: 910, high: 4000, treb: 14000 };
+      let previousNode = preampNode;
+
+      Object.keys(frequencies).forEach(key => {
+        const filter = audioContext.createBiquadFilter();
+        if (key === 'sub') filter.type = 'lowshelf';
+        else if (key === 'treb') filter.type = 'highshelf';
+        else filter.type = 'peaking';
+        
+        filter.frequency.value = frequencies[key];
+        filter.Q.value = 1.0;
+        filter.gain.value = parseFloat(document.getElementById(`slider-${key}`).value);
+        
+        biquadFilters[key] = filter;
+        previousNode.connect(filter);
+        previousNode = filter;
+      });
+
+      previousNode.connect(analyserNode);
+      analyserNode.connect(audioContext.destination);
+    }
+
+    // Load local files directly into the client engine
+    audioPicker.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      currentFile = file;
+      uploadLabel.innerText = "SWAP ACTIVE SOURCE";
+      trackTitleDisplay.innerText = file.name.toUpperCase();
+      trackMetaDisplay.innerText = `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB — Reading file system headers...`;
+      statusLogger.innerText = "DECODING AUDIO CODECS...";
+
+      buildAudioRoutingGraph();
+      if (isPlaying) stopPreviewTrack();
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          // Decode file data arrays asynchronously on the main execution frame
+          audioBuffer = await audioContext.decodeAudioData(event.target.result);
+          trackMetaDisplay.innerText = `Sample Rate: ${audioBuffer.sampleRate}Hz — Length: ${Math.floor(audioBuffer.duration)}s`;
+          statusLogger.innerText = "READY";
+          btnPlay.disabled = false;
+          btnDownload.disabled = false;
+          btnPlay.classList.remove('opacity-30');
+          timeline.max = Math.floor(audioBuffer.duration);
+          timeTotal.innerText = formatTimeStructure(audioBuffer.duration);
+          resetTimelineMetrics();
+        } catch (err) {
+          trackMetaDisplay.innerText = "ERROR CODEC MISMATCH OR CORRUPTED TRACK STRUCTURE.";
+          statusLogger.innerText = "CRITICAL COGNITIVE DISRUPTION";
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    function formatTimeStructure(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function resetTimelineMetrics() {
+      startTimeOffset = 0;
+      timeline.value = 0;
+      timeCurrent.innerText = "0:00";
+    }
+
+    // Toggle live playback loops
+    btnPlay.addEventListener('click', () => {
+      if (!audioBuffer) return;
+      if (isPlaying) {
+        pausePreviewTrack();
+      } else {
+        startPreviewTrack();
+      }
+    });
+
+    function startPreviewTrack() {
+      if (audioContext.state === 'suspended') audioContext.resume();
+      
+      audioSourceNode = audioContext.createBufferSource();
+      audioSourceNode.buffer = audioBuffer;
+      audioSourceNode.playbackRate.value = playbackRateValue;
+      
+      audioSourceNode.connect(preampNode);
+      
+      // Calculate loop metrics cleanly across pitch modulations
+      audioSourceNode.start(0, startTimeOffset);
+      timestampToCalculateOffset = audioContext.currentTime;
+      isPlaying = true;
+      btnPlay.innerText = "Pause Preview";
+      statusLogger.innerText = "STREAMING PLAYBACK";
+    }
+
+    function pausePreviewTrack() {
+      if (!audioSourceNode) return;
+      isPlaying = false;
+      audioSourceNode.stop();
+      // Keep track of the current playback position across modifications
+      startTimeOffset += (audioContext.currentTime - timestampToCalculateOffset) * playbackRateValue;
+      btnPlay.innerText = "Play Preview";
+      statusLogger.innerText = "PAUSED";
+    }
+
+    function stopPreviewTrack() {
+      if (audioSourceNode) {
+        try { audioSourceNode.stop(); } catch(e){}
+      }
+      isPlaying = false;
+      btnPlay.innerText = "Play Preview";
+    }
+
+    // Monitor input changes across controls
+    document.getElementById('slider-pitch').addEventListener('input', (e) => {
+      playbackRateValue = parseFloat(e.target.value);
+      document.getElementById('label-pitch').innerText = `${playbackRateValue.toFixed(2)}x`;
+      if (isPlaying && audioSourceNode) {
+        // Adjust node pitch dynamically in real time
+        audioSourceNode.playbackRate.value = playbackRateValue;
+        
+        // Recalculate timeline offsets based on the new playback speed
+        startTimeOffset += (audioContext.currentTime - timestampToCalculateOffset) * audioSourceNode.playbackRate.value;
+        timestampToCalculateOffset = audioContext.currentTime;
+      }
+    });
+
+    document.getElementById('slider-preamp').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      document.getElementById('label-preamp').innerText = `${val > 0 ? '+' : ''}${val.toFixed(1)} dB`;
+      if (preampNode) preampNode.gain.value = Math.pow(10, val / 20);
+    });
+
+    ['sub', 'low', 'mid', 'high', 'treb'].forEach(key => {
+      document.getElementById(`slider-${key}`).addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById(`v-${key}`).innerText = val > 0 ? `+${val}` : val;
+        if (biquadFilters[key]) biquadFilters[key].gain.value = val;
+      });
+    });
+
+    // Update timeline position on user interaction
+    timeline.addEventListener('input', (e) => {
+      const targetTime = parseFloat(e.target.value);
+      if (isPlaying) {
+        stopPreviewTrack();
+        startTimeOffset = targetTime;
+        startPreviewTrack();
+      } else {
+        startTimeOffset = targetTime;
+        timeCurrent.innerText = formatTimeStructure(targetTime);
+      }
+    });
+
+    // Main frame animation loop
+    function updateFrameLoop() {
+      requestAnimationFrame(updateFrameLoop);
+      
+      if (isPlaying && audioBuffer) {
+        const exactCurrentTime = startTimeOffset + (audioContext.currentTime - timestampToCalculateOffset) * playbackRateValue;
+        if (exactCurrentTime >= audioBuffer.duration) {
+          resetTimelineMetrics();
+          stopPreviewTrack();
+        } else {
+          timeline.value = Math.floor(exactCurrentTime);
+          timeCurrent.innerText = formatTimeStructure(exactCurrentTime);
+        }
+      }
+
+      // Visualizer frequency bars
+      if (analyserNode) {
+        const bufferLength = analyserNode.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyserNode.getByteFrequencyData(dataArray);
+
+        canvasCtx.fillStyle = '#000000';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 1.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = dataArray[i] * 0.7;
+          canvasCtx.fillStyle = `rgba(255, 255, 255, ${dataArray[i] / 255})`;
+          canvasCtx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+          x += barWidth;
+        }
+      }
+    }
+    updateFrameLoop();
+
+    // Export engine processing loop (Offline Audio Context)
+    btnDownload.addEventListener('click', async () => {
+      if (!audioBuffer || !currentFile) return;
+
+      statusLogger.innerText = "COMPILING AUDIO GRAPH MODULES...";
+      btnDownload.disabled = true;
+      btnDownload.innerText = "Processing...";
+
+      const offlineCtx = new OfflineAudioContext(
+        audioBuffer.numberOfChannels,
+        audioBuffer.duration * audioBuffer.sampleRate / playbackRateValue,
+        audioBuffer.sampleRate
+      );
+
+      // Rebuild the DSP graph inside the background execution thread
+      const offlineSource = offlineCtx.createBufferSource();
+      offlineSource.buffer = audioBuffer;
+      offlineSource.playbackRate.value = playbackRateValue;
+
+      const offlinePreamp = offlineCtx.createGain();
+      offlinePreamp.gain.value = preampNode.gain.value;
+
+      let currentOfflineNode = offlinePreamp;
+      offlineSource.connect(offlinePreamp);
+
+      ['sub', 'low', 'mid', 'high', 'treb'].forEach(key => {
+        const offlineFilter = offlineCtx.createBiquadFilter();
+        offlineFilter.type = biquadFilters[key].type;
+        offlineFilter.frequency.value = biquadFilters[key].frequency.value;
+        offlineFilter.Q.value = biquadFilters[key].Q.value;
+        offlineFilter.gain.value = biquadFilters[key].gain.value;
+        
+        currentOfflineNode.connect(offlineFilter);
+        currentOfflineNode = offlineFilter;
+      });
+
+      currentOfflineNode.connect(offlineCtx.destination);
+      offlineSource.start(0);
+
+      try {
+        const renderedBuffer = await offlineCtx.startRendering();
+        
+        // Encode the rendered buffer into a structured WAV format file
+        const wavBlob = writeWavFileFormat(renderedBuffer);
+        const downloadUrl = URL.createObjectURL(wavBlob);
+        
+        const anchor = document.createElement('a');
+        anchor.href = downloadUrl;
+        
+        // Append modified identifiers to exported files
+        const originalName = currentFile.name.substring(0, currentFile.name.lastIndexOf('.'));
+        anchor.download = `${originalName}_quellqualised.wav`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        
+        // Clean up allocation pointers across the browser stack
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(downloadUrl);
+        
+        statusLogger.innerText = "DOWNLOAD COMPLETE";
+      } catch (err) {
+        console.error(err);
+        statusLogger.innerText = "EXPORT TIMEOUT OR ABORT ERROR";
+      } finally {
+        btnDownload.disabled = false;
+        btnDownload.innerText = "Compile & Download";
+      }
+    });
+
+    // RIFF WAV layout byte parser module
+    function writeWavFileFormat(audioBuffer) {
+      const numOfChan = audioBuffer.numberOfChannels;
+      const sampleRate = audioBuffer.sampleRate;
+      const format = 1; // 1 = Uncompressed linear PCM structure 
+      const bitDepth = 16;
+      
+      let result;
+      if (numOfChan === 2) {
+        result = mergeChannelsToInterleavedData(audioBuffer.getChannelData(0), audioBuffer.getChannelData(1));
+      } else {
+        result = audioBuffer.getChannelData(0);
+      }
+      
+      const buffer = new ArrayBuffer(44 + result.length * 2);
+      const view = new DataView(buffer);
+      
+      /* RIFF identifier descriptor tags */
+      writeStringBytesIntoDataView(view, 0, 'RIFF');
+      view.setUint32(4, 36 + result.length * 2, true);
+      writeStringBytesIntoDataView(view, 8, 'WAVE');
+      /* Format specification chunk descriptor sub-block */
+      writeStringBytesIntoDataView(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, format, true);
+      view.setUint16(22, numOfChan, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * numOfChan * (bitDepth / 8), true);
+      view.setUint16(32, numOfChan * (bitDepth / 8), true);
+      view.setUint16(34, bitDepth, true);
+      /* Structural audio PCM data stream sub-block */
+      writeStringBytesIntoDataView(view, 36, 'data');
+      view.setUint32(40, result.length * 2, true);
+      
+      writeFloat32DataStreamTo16BitPCM(view, 44, result);
+      
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    function mergeChannelsToInterleavedData(inputL, inputR) {
+      const length = inputL.length + inputR.length;
+      const interleaved = new Float32Array(length);
+      let index = 0;
+      let inputIndex = 0;
+      
+      while (index < length) {
+        interleaved[index++] = inputL[inputIndex];
+        interleaved[index++] = inputR[inputIndex];
+        inputIndex++;
+      }
+      return interleaved;
+    }
+
+    function writeFloat32DataStreamTo16BitPCM(output, offset, input) {
+      for (let i = 0; i < input.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+    }
+
+    function writeStringBytesIntoDataView(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    }
+  </script>
+</body>
+</html>
