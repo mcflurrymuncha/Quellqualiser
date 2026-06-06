@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUELLQUALISER</title>
+  <title>QUELLQUALISER Studio</title>
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
@@ -20,13 +22,12 @@
       width: 100vw; 
       overflow: hidden; 
       display: flex; 
-      flex-col: column;
       flex-direction: column;
       justify-content: space-between; 
       padding: 16px;
     }
 
-    /* Layout Containers */
+    /* Top Navigation Layout */
     .nav-bar {
       height: 48px;
       border: 1px solid #18181b;
@@ -46,17 +47,43 @@
       margin-right: 8px;
     }
     .brand-title { font-weight: bold; letter-spacing: 0.1em; font-size: 12px; }
-    .subtitle { font-size: 9px; color: #71717a; text-transform: uppercase; }
+    
+    /* Tab System Switchers */
+    .tab-group { display: flex; gap: 4px; }
+    .tab-btn {
+      background: #18181b;
+      color: #a1a1aa;
+      border: 1px solid #27272a;
+      padding: 6px 16px;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
 
+    /* Pages Container */
     .workspace {
       flex: 1;
       margin: 12px 0;
       display: flex;
       gap: 12px;
       overflow: hidden;
+      position: relative;
     }
+    .page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      gap: 12px;
+    }
+    .page.active { display: flex; }
 
-    /* Left Control Panel */
+    /* Column Panels */
     .control-panel {
       width: 320px;
       border: 1px solid #18181b;
@@ -68,8 +95,6 @@
       overflow-y: auto;
       flex-shrink: 0;
     }
-
-    /* Right Display Panel */
     .display-panel {
       flex: 1;
       border: 1px solid #18181b;
@@ -80,8 +105,18 @@
       justify-content: space-between;
       overflow: hidden;
     }
+    .full-panel {
+      flex: 1;
+      border: 1px solid #18181b;
+      background-color: #09090b;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
 
-    /* Modular Section Cards */
+    /* Modular Interface Cards */
     .card {
       border: 1px solid #27272a;
       padding: 12px;
@@ -97,7 +132,28 @@
       margin-bottom: 8px;
     }
 
-    /* Upload Target Button */
+    /* Forms & Inputs */
+    .input-field {
+      width: 100%;
+      background-color: #000000;
+      border: 1px solid #27272a;
+      color: #ffffff;
+      padding: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .input-field:focus { border-color: #ffffff; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      cursor: pointer;
+    }
+
     .upload-zone {
       display: block;
       width: 100%;
@@ -110,7 +166,6 @@
     .upload-zone:hover { border-color: #ffffff; }
     .upload-subtext { display: block; font-size: 9px; opacity: 0.4; margin-top: 4px; }
 
-    /* Control Element Layouts */
     .control-row {
       display: flex;
       justify-content: space-between;
@@ -121,7 +176,7 @@
     }
     .value-display { color: #ffffff; }
 
-    /* Slider Engine Customization */
+    /* Faders & Ranges */
     input[type="range"].horizontal {
       width: 100%;
       height: 4px;
@@ -136,7 +191,7 @@
       width: 8px; height: 14px; background: #ffffff; cursor: pointer; border: none;
     }
 
-    /* Equalizer Grid Styling */
+    /* Equalizer Styles */
     .eq-grid {
       height: 140px;
       border: 1px solid #18181b;
@@ -165,7 +220,7 @@
       background: transparent;
     }
 
-    /* Visualizer & Outputs */
+    /* Dynamic Visualizer Elements */
     .visualizer-container {
       width: 100%;
       flex: 1;
@@ -194,6 +249,7 @@
     }
     .time-stamp { font-size: 9px; color: #a1a1aa; font-weight: bold; }
 
+    /* Bottom Control Decks */
     .footer-panel {
       border: 1px solid #27272a;
       background-color: #000000;
@@ -206,7 +262,18 @@
     .track-title { font-weight: bold; color: #e4e4e7; font-size: 12px; text-transform: uppercase; }
     .track-meta { font-size: 9px; color: #52525b; text-transform: uppercase; margin-top: 2px; font-weight: bold; }
     
-    .button-group { display: flex; gap: 8px; }
+    .button-group { display: flex; gap: 8px; align-items: center; }
+    .select-dropdown {
+      background-color: #000000;
+      color: #ffffff;
+      border: 1px solid #424242;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      height: 40px;
+      padding: 0 12px;
+      outline: none;
+    }
+
     button {
       height: 40px;
       font-weight: bold;
@@ -216,15 +283,8 @@
       border: none;
       transition: opacity 0.2s;
     }
-    .btn-secondary {
-      border: 1px solid #424242;
-      background: transparent;
-      color: #ffffff;
-    }
-    .btn-primary {
-      background-color: #ffffff;
-      color: #000000;
-    }
+    .btn-secondary { border: 1px solid #424242; background: transparent; color: #ffffff; }
+    .btn-primary { background-color: #ffffff; color: #000000; }
     button:disabled { opacity: 0.2 !important; cursor: not-allowed; }
     button:hover:not(:disabled) { opacity: 0.8; }
 
@@ -248,104 +308,161 @@
   <div class="nav-bar">
     <div>
       <span class="status-dot"></span>
-      <span class="brand-title">QUELLQUALISER: Quellqa, but web!</span>
+      <span class="brand-title">QUELLQUALISER WORKSTATION</span>
     </div>
-    <div class="subtitle">v3.0.0</div>
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchPage('audio-dsp')">1. Audio Processing</button>
+      <button class="tab-btn" onclick="switchPage('metadata-id3')">2. Tag Editor</button>
+    </div>
   </div>
 
   <div class="workspace">
     
-    <div class="control-panel">
-      
-      <div class="card">
-        <span class="card-title">Audio Input</span>
-        <label class="upload-zone">
-          <span id="upload-label" style="font-weight: bold;">SELECT AUDIO FILE</span>
-          <span class="upload-subtext">Accepts MP3, WAV, FLAC, M4A</span>
-          <input type="file" id="audio-picker" accept="audio/*" class="hidden" style="display:none;">
-        </label>
-      </div>
-
-      <div class="card">
-        <span class="card-title">Resampling Modification</span>
-        <div class="control-row">
-          <span>PLAYBACK SPEED & PITCH</span>
-          <span id="label-pitch" class="value-display">1.00x</span>
+    <div id="page-audio-dsp" class="page active">
+      <div class="control-panel">
+        <div class="card">
+          <span class="card-title">Audio Input Source</span>
+          <label class="upload-zone">
+            <span id="upload-label" style="font-weight: bold;">SELECT AUDIO FILE</span>
+            <span class="upload-subtext">MP3, WAV, FLAC, M4A</span>
+            <input type="file" id="audio-picker" accept="audio/*" style="display:none;">
+          </label>
         </div>
-        <input type="range" id="slider-pitch" min="0.5" max="2.0" step="0.01" value="1.0" class="horizontal">
-      </div>
 
-      <div class="card">
-        <span class="card-title">Parametric Equalizer Grid</span>
-        <div class="eq-grid">
-          <div class="eq-column">
-            <span id="v-sub" class="eq-val">0dB</span>
-            <input type="range" id="slider-sub" min="-15" max="15" step="1" value="0" class="vertical">
-            <span class="eq-label">Sub Bass</span>
+        <div class="card">
+          <span class="card-title">Resampling Modification</span>
+          <div class="control-row">
+            <span>PLAYBACK SPEED & PITCH</span>
+            <span id="label-pitch" class="value-display">1.00x</span>
           </div>
-          <div class="eq-column">
-            <span id="v-low" class="eq-val">0dB</span>
-            <input type="range" id="slider-low" min="-15" max="15" step="1" value="0" class="vertical">
-            <span class="eq-label">Low Mid</span>
+          <input type="range" id="slider-pitch" min="0.5" max="2.0" step="0.01" value="1.0" class="horizontal">
+        </div>
+
+        <div class="card">
+          <span class="card-title">Parametric Equalizer Grid</span>
+          <div class="eq-grid">
+            <div class="eq-column">
+              <span id="v-sub" class="eq-val">0dB</span>
+              <input type="range" id="slider-sub" min="-15" max="15" step="1" value="0" class="vertical">
+              <span class="eq-label">Sub Bass</span>
+            </div>
+            <div class="eq-column">
+              <span id="v-low" class="eq-val">0dB</span>
+              <input type="range" id="slider-low" min="-15" max="15" step="1" value="0" class="vertical">
+              <span class="eq-label">Low Mid</span>
+            </div>
+            <div class="eq-column">
+              <span id="v-mid" class="eq-val">0dB</span>
+              <input type="range" id="slider-mid" min="-15" max="15" step="1" value="0" class="vertical">
+              <span class="eq-label">Midrange</span>
+            </div>
+            <div class="eq-column">
+              <span id="v-high" class="eq-val">0dB</span>
+              <input type="range" id="slider-high" min="-15" max="15" step="1" value="0" class="vertical">
+              <span class="eq-label">High Mid</span>
+            </div>
+            <div class="eq-column">
+              <span id="v-treb" class="eq-val">0dB</span>
+              <input type="range" id="slider-treb" min="-15" max="15" step="1" value="0" class="vertical">
+              <span class="eq-label">Treble</span>
+            </div>
           </div>
-          <div class="eq-column">
-            <span id="v-mid" class="eq-val">0dB</span>
-            <input type="range" id="slider-mid" min="-15" max="15" step="1" value="0" class="vertical">
-            <span class="eq-label">Midrange</span>
+        </div>
+
+        <div class="card" style="margin-top: auto;">
+          <div class="control-row">
+            <span>INPUT PRE-AMPLIFIER (GAIN)</span>
+            <span id="label-preamp" class="value-display">0.0 dB</span>
           </div>
-          <div class="eq-column">
-            <span id="v-high" class="eq-val">0dB</span>
-            <input type="range" id="slider-high" min="-15" max="15" step="1" value="0" class="vertical">
-            <span class="eq-label">High Mid</span>
-          </div>
-          <div class="eq-column">
-            <span id="v-treb" class="eq-val">0dB</span>
-            <input type="range" id="slider-treb" min="-15" max="15" step="1" value="0" class="vertical">
-            <span class="eq-label">Treble</span>
-          </div>
+          <input type="range" id="slider-preamp" min="-12" max="12" step="0.5" value="0" class="horizontal">
         </div>
       </div>
 
-      <div class="card" style="margin-top: auto;">
-        <div class="control-row">
-          <span>PRE-AMP (GAIN)</span>
-          <span id="label-preamp" class="value-display">0.0 dB</span>
+      <div class="display-panel">
+        <div class="visualizer-container">
+          <canvas id="visualiser"></canvas>
+          <div class="visualizer-label">Live Frequency Monitoring Analyzer</div>
         </div>
-        <input type="range" id="slider-preamp" min="-12" max="12" step="0.5" value="0" class="horizontal">
+        <div class="timeline-container">
+          <span id="time-current" class="time-stamp">0:00</span>
+          <input type="range" id="timeline" min="0" max="100" value="0" class="horizontal" style="flex: 1; cursor: pointer;">
+          <span id="time-total" class="time-stamp">0:00</span>
+        </div>
+        <div class="footer-panel">
+          <div class="track-info">
+            <span class="track-title" id="track-title-display">No Track Loaded</span>
+            <span class="track-meta" id="track-meta-display">Audio Context Engine Idle</span>
+          </div>
+          <div class="button-group">
+            <button id="btn-play" disabled class="btn-secondary">Play Preview</button>
+            <select id="export-format" class="select-dropdown">
+              <option value="mp3">Format: MP3 (.mp3)</option>
+              <option value="m4a">Format: M4A (.m4a)</option>
+            </select>
+            <button id="btn-download" disabled class="btn-primary">Render & Download</button>
+          </div>
+        </div>
       </div>
-
     </div>
 
-    <div class="display-panel">
-      
-      <div class="visualizer-container">
-        <canvas id="visualiser"></canvas>
-        <div class="visualizer-label">Live Frequency Monitoring Analyzer</div>
-      </div>
+    <div id="page-metadata-id3" class="page">
+      <div class="full-panel">
+        <div class="card">
+          <span class="card-title" style="font-size: 11px; margin-bottom: 16px; color:#fff;">Metadata Management Engine</span>
+          
+          <div class="form-row">
+            <div>
+              <label class="control-row">TRACK TITLE</label>
+              <input type="text" id="tag-title" class="input-field" placeholder="e.g. Quellqualised Track">
+            </div>
+            <div>
+              <label class="control-row">ARTIST NAME</label>
+              <input type="text" id="tag-artist" class="input-field" placeholder="e.g. Studio Producer">
+            </div>
+          </div>
 
-      <div class="timeline-container">
-        <span id="time-current" class="time-stamp">0:00</span>
-        <input type="range" id="timeline" min="0" max="100" value="0" class="horizontal" style="flex: 1; cursor: pointer;">
-        <span id="time-total" class="time-stamp">0:00</span>
-      </div>
+          <div class="form-row">
+            <div>
+              <label class="control-row">ALBUM TITLE</label>
+              <input type="text" id="tag-album" class="input-field" placeholder="e.g. Custom Edits Vol 1">
+            </div>
+            <div>
+              <label class="control-row">TRACK NUMBER / INDEX</label>
+              <input type="text" id="tag-track" class="input-field" placeholder="e.g. 01">
+            </div>
+          </div>
 
-      <div class="footer-panel">
-        <div class="track-info">
-          <span class="track-title" id="track-title-display">No Track Loaded</span>
-          <span class="track-meta" id="track-meta-display">Audio Context Engine Idle</span>
+          <div class="form-row">
+            <div>
+              <label class="control-row">GENRE CLASSIFICATION</label>
+              <input type="text" id="tag-genre" class="input-field" placeholder="e.g. Electronic / Bass">
+            </div>
+            <div>
+              <label class="control-row">RELEASE YEAR</label>
+              <input type="text" id="tag-year" class="input-field" placeholder="2026">
+            </div>
+          </div>
+
+          <div id="itunes-advisory-container" class="card" style="border-color: #27272a; margin-top: 10px; background-color: #09090b;">
+            <span class="card-title" style="color: #ffffff;">M4A Container Flags (MPEG-4 Container Only)</span>
+            <label class="checkbox-container">
+              <input type="checkbox" id="tag-explicit" style="accent-color: #ffffff; width:14px; height:14px;">
+              <span style="font-size:11px; font-weight: bold;">Write ITUNESADVISORY Meta Atom flag as Explicit (Value = 1)</span>
+            </label>
+            <p style="font-size: 9px; color: #52525b; margin-top: 6px; line-height: 1.3;">
+              * Note: If checked, Apple Music/iTunes compatible players will display the "Explicit" badge next to this audio file. If left unchecked, the asset configuration atom header will completely bypass writing this flag.
+            </p>
+          </div>
+
         </div>
-        <div class="button-group">
-          <button id="btn-play" disabled class="btn-secondary">Play Preview</button>
-          <button id="btn-download" disabled class="btn-primary">Render As MP3 File</button>
-        </div>
       </div>
-
     </div>
+
   </div>
 
   <div class="system-status-bar">
-    <span>Your Files only stay on your Computer, Nothing is sent to a Server.</span>
-    <span id="status-logger" style="color: #a1a1aa;">Waiting for File Upload</span>
+    <span>System Stack: Core Audio Processing Console</span>
+    <span id="status-logger" style="color: #a1a1aa;">WAITING FOR USER SOURCE INGESTION</span>
   </div>
 
   <script>
@@ -369,12 +486,22 @@
     const trackMetaDisplay = document.getElementById('track-meta-display');
     const btnPlay = document.getElementById('btn-play');
     const btnDownload = document.getElementById('btn-download');
+    const exportFormat = document.getElementById('export-format');
     const statusLogger = document.getElementById('status-logger');
     const timeline = document.getElementById('timeline');
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
     const canvas = document.getElementById('visualiser');
     const canvasCtx = canvas.getContext('2d');
+
+    // UI Tab Navigation Router
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(`page-${pageId}`).classList.add('active');
+      event.target.classList.add('active');
+    }
     
     function buildAudioRoutingGraph() {
       if (!audioContext) {
@@ -408,6 +535,7 @@
       analyserNode.connect(audioContext.destination);
     }
 
+    // Capture files and automatically read metadata contents 
     audioPicker.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -415,8 +543,31 @@
       currentFile = file;
       uploadLabel.innerText = "SWAP ACTIVE AUDIO FILE";
       trackTitleDisplay.innerText = file.name.toUpperCase();
-      trackMetaDisplay.innerText = `File Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB — Reading digital headers...`;
-      statusLogger.innerText = "DECODING RAW SAMPLE BINARIES...";
+      trackMetaDisplay.innerText = `File Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB — Reading headers...`;
+      statusLogger.innerText = "PARSING AUDIO FILE METADATA...";
+
+      // Clear metadata text inputs before population
+      document.getElementById('tag-title').value = file.name.replace(/\.[^/.]+$/, "");
+      document.getElementById('tag-artist').value = "";
+      document.getElementById('tag-album').value = "";
+      document.getElementById('tag-track').value = "";
+      document.getElementById('tag-genre').value = "";
+      document.getElementById('tag-year').value = new Date().getFullYear();
+
+      // Read existing tags using JSMediaTags
+      jsmediatags.read(file, {
+        onSuccess: function(tag) {
+          if(tag.tags.title) document.getElementById('tag-title').value = tag.tags.title;
+          if(tag.tags.artist) document.getElementById('tag-artist').value = tag.tags.artist;
+          if(tag.tags.album) document.getElementById('tag-album').value = tag.tags.album;
+          if(tag.tags.track) document.getElementById('tag-track').value = tag.tags.track;
+          if(tag.tags.genre) document.getElementById('tag-genre').value = tag.tags.genre;
+          if(tag.tags.year) document.getElementById('tag-year').value = tag.tags.year;
+        },
+        onError: function(error) {
+          console.log('No metadata tags found in raw source file headers.');
+        }
+      });
 
       buildAudioRoutingGraph();
       if (isPlaying) stopPreviewTrack();
@@ -468,8 +619,8 @@
       audioSourceNode.start(0, startTimeOffset);
       timestampToCalculateOffset = audioContext.currentTime;
       isPlaying = true;
-      btnPlay.innerText = "Pause";
-      statusLogger.innerText = "Preview Playing";
+      btnPlay.innerText = "Pause Preview";
+      statusLogger.innerText = "LIVE SIGNAL STREAMING ACTIVE";
     }
 
     function pausePreviewTrack() {
@@ -477,14 +628,14 @@
       isPlaying = false;
       audioSourceNode.stop();
       startTimeOffset += (audioContext.currentTime - timestampToCalculateOffset) * playbackRateValue;
-      btnPlay.innerText = "Play";
-      statusLogger.innerText = "Preview Paused";
+      btnPlay.innerText = "Play Preview";
+      statusLogger.innerText = "PREVIEW PAUSED";
     }
 
     function stopPreviewTrack() {
       if (audioSourceNode) { try { audioSourceNode.stop(); } catch(e){} }
       isPlaying = false;
-      btnPlay.innerText = "Play";
+      btnPlay.innerText = "Play Preview";
     }
 
     document.getElementById('slider-pitch').addEventListener('input', (e) => {
@@ -558,12 +709,14 @@
     }
     updateFrameLoop();
 
+    // RENDER & DOWNLOAD PROCESSOR
     btnDownload.addEventListener('click', async () => {
       if (!audioBuffer || !currentFile) return;
 
-      statusLogger.innerText = "Compiling MP3 File";
+      const selectedFormat = exportFormat.value;
+      statusLogger.innerText = "RENDERING DSP HARMONICS TO OFFLINE PIPELINE...";
       btnDownload.disabled = true;
-      btnDownload.innerText = "Processing...";
+      btnDownload.innerText = "Rendering...";
 
       const offlineCtx = new OfflineAudioContext(
         audioBuffer.numberOfChannels,
@@ -597,35 +750,58 @@
 
       try {
         const renderedBuffer = await offlineCtx.startRendering();
-        statusLogger.innerText = "Encoding";
+        let audioBlob;
         
-        const mp3Blob = encodeAudioBufferToMp3(renderedBuffer);
-        const downloadUrl = URL.createObjectURL(mp3Blob);
+        const metadata = {
+          title: document.getElementById('tag-title').value,
+          artist: document.getElementById('tag-artist').value,
+          album: document.getElementById('tag-album').value,
+          track: document.getElementById('tag-track').value,
+          genre: document.getElementById('tag-genre').value,
+          year: document.getElementById('tag-year').value,
+          explicit: document.getElementById('tag-explicit').checked
+        };
+
+        if (selectedFormat === 'mp3') {
+          statusLogger.innerText = "COMPILING MP3 & METADATA ATOMS...";
+          audioBlob = encodeAudioBufferToMp3(renderedBuffer, metadata);
+        } else {
+          statusLogger.innerText = "COMPILING M4A CONTAINER & APPLE ADVISORY ATOMS...";
+          audioBlob = await encodeAudioBufferToM4A(renderedBuffer, metadata);
+        }
         
+        const downloadUrl = URL.createObjectURL(audioBlob);
         const anchor = document.createElement('a');
         anchor.href = downloadUrl;
+        
         const originalName = currentFile.name.substring(0, currentFile.name.lastIndexOf('.'));
-        anchor.download = `${originalName}_quellqualised.mp3`;
+        anchor.download = `${originalName}_quellqualised.${selectedFormat}`;
         document.body.appendChild(anchor);
         anchor.click();
         
         document.body.removeChild(anchor);
         URL.revokeObjectURL(downloadUrl);
-        statusLogger.innerText = "MP3 Downloaded!";
+        statusLogger.innerText = "RENDER PIPELINE EXPORT SUCCESSFUL";
       } catch (err) {
         console.error(err);
-        statusLogger.innerText = "Error While Compiling MP3!";
+        statusLogger.innerText = "EXPORT EXCEPTION DETECTED";
       } finally {
         btnDownload.disabled = false;
-        btnDownload.innerText = "Render As MP3 File";
+        btnDownload.innerText = "Render & Download";
       }
     });
 
-    function encodeAudioBufferToMp3(audioBuffer) {
+    // MP3 ID3v2 COMPILATION MODULE
+    function encodeAudioBufferToMp3(audioBuffer, tags) {
       const channels = audioBuffer.numberOfChannels;
       const sampleRate = audioBuffer.sampleRate;
       const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 192);
       const mp3Data = [];
+
+      // Create an explicit ID3v2 Metadata Header Block
+      const id3Header = createID3v2TagBuffer(tags);
+      mp3Data.push(id3Header);
+
       const sampleLength = audioBuffer.length;
       let leftChannelData = audioBuffer.getChannelData(0);
       let rightChannelData = channels === 2 ? audioBuffer.getChannelData(1) : leftChannelData;
@@ -644,17 +820,200 @@
         }
         
         let mp3tmp = mp3encoder.encodeBuffer(leftChunk, rightChunk);
-        if (mp3tmp.length > 0) {
-          mp3Data.push(new Uint8Array(mp3tmp));
-        }
+        if (mp3tmp.length > 0) mp3Data.push(new Uint8Array(mp3tmp));
       }
       
       let mp3final = mp3encoder.flush();
-      if (mp3final.length > 0) {
-        mp3Data.push(new Uint8Array(mp3final));
-      }
+      if (mp3final.length > 0) mp3Data.push(new Uint8Array(mp3final));
       
       return new Blob(mp3Data, { type: 'audio/mp3' });
+    }
+
+    function createID3v2TagBuffer(tags) {
+      const frames = [];
+      
+      function pushTextFrame(id, value) {
+        if (!value) return;
+        const valueBuffer = new TextEncoder().encode('\0' + value); 
+        const frameHeader = new Uint8Array(10);
+        // Set up the ID Frame
+        for (let i = 0; i < 4; i++) frameHeader[i] = id.charCodeAt(i);
+        // Compute Size Flags
+        const len = valueBuffer.length;
+        frameHeader[4] = (len >>> 24) & 0xFF;
+        frameHeader[5] = (len >>> 16) & 0xFF;
+        frameHeader[6] = (len >>> 8) & 0xFF;
+        frameHeader[7] = len & 0xFF;
+        
+        const completeFrame = new Uint8Array(10 + len);
+        completeFrame.set(frameHeader, 0);
+        completeFrame.set(valueBuffer, 10);
+        frames.push(completeFrame);
+      }
+
+      pushTextFrame('TIT2', tags.title);
+      pushTextFrame('TPE1', tags.artist);
+      pushTextFrame('TALB', tags.album);
+      pushTextFrame('TRCK', tags.track);
+      pushTextFrame('TCON', tags.genre);
+      pushTextFrame('TYER', tags.year);
+
+      let totalFramesSize = frames.reduce((acc, f) => acc + f.length, 0);
+      const tagHeader = new Uint8Array(10);
+      tagHeader[0] = 73; // I
+      tagHeader[1] = 68; // D
+      tagHeader[2] = 51; // 3
+      tagHeader[3] = 3;  // v2.3
+      tagHeader[4] = 0;
+      tagHeader[5] = 0;  // Flags
+
+      // ID3 Synchsafe integer mapping calculations
+      tagHeader[6] = (totalFramesSize >>> 21) & 0x7F;
+      tagHeader[7] = (totalFramesSize >>> 14) & 0x7F;
+      tagHeader[8] = (totalFramesSize >>> 7) & 0x7F;
+      tagHeader[9] = totalFramesSize & 0x7F;
+
+      const outputBuffer = new Uint8Array(10 + totalFramesSize);
+      outputBuffer.set(tagHeader, 0);
+      let offset = 10;
+      frames.forEach(f => {
+        outputBuffer.set(f, offset);
+        offset += f.length;
+      });
+
+      return outputBuffer;
+    }
+
+    // M4A CONTAINER ATOM GENERATOR ENGINE 
+    async function encodeAudioBufferToM4A(audioBuffer, tags) {
+      // Stream raw internal rendering parameters to browser web recorders
+      const destination = audioContext.createMediaStreamDestination();
+      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType: 'audio/webm;codecs=opus' });
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = e => chunks.push(e.data);
+      
+      const playSource = audioContext.createBufferSource();
+      playSource.buffer = audioBuffer;
+      playSource.connect(destination);
+      
+      const recordingPromise = new Promise(resolve => {
+        mediaRecorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/mp4' }));
+      });
+
+      mediaRecorder.start();
+      playSource.start(0);
+      
+      // Compute the absolute timeline array bounds
+      setTimeout(() => {
+        mediaRecorder.stop();
+        playSource.stop();
+      }, (audioBuffer.duration * 1000) + 200);
+
+      const baseBlob = await recordingPromise;
+      const rawArrayBuffer = await baseBlob.arrayBuffer();
+      
+      return injectM4AAtoms(rawArrayBuffer, tags);
+    }
+
+    // Injects explicit/clean metadata atoms into an audio track
+    function injectM4AAtoms(baseBuffer, tags) {
+      const dataView = new DataView(baseBuffer);
+      const uint8 = new Uint8Array(baseBuffer);
+      
+      // Metadata processing allocations
+      const textEncoder = new TextEncoder();
+      const metaAtoms = [];
+
+      function createStringAtom(type, val) {
+        if(!val) return;
+        const textBytes = textEncoder.encode(val);
+        const atom = new Uint8Array(8 + 8 + 8 + textBytes.length);
+        const view = new DataView(atom.buffer);
+        
+        // Write standard box length descriptors
+        view.setUint32(0, atom.length);
+        view.setUint8(4, type.charCodeAt(0));
+        view.setUint8(5, type.charCodeAt(1));
+        view.setUint8(6, type.charCodeAt(2));
+        view.setUint8(7, type.charCodeAt(3));
+        
+        // Data payload indicator flags
+        view.setUint32(8, 8 + textBytes.length);
+        view.setUint8(12, 'd'.charCodeAt(0));
+        view.setUint8(13, 'a'.charCodeAt(0));
+        view.setUint8(14, 't'.charCodeAt(0));
+        view.setUint8(15, 'a'.charCodeAt(0));
+        view.setUint32(16, 1); // Type Indicator: UTF-8 String text
+        
+        atom.set(textBytes, 24);
+        metaAtoms.push(atom);
+      }
+
+      createStringAtom('©nam', tags.title);
+      createStringAtom('©ART', tags.artist);
+      createStringAtom('©alb', tags.album);
+      createStringAtom('©gen', tags.genre);
+      createStringAtom('©day', tags.year);
+
+      // Check user preferences before applying Apple Advisory Atoms
+      if (tags.explicit) {
+        const rtngAtom = new Uint8Array(8 + 8 + 1);
+        const rView = new DataView(rtngAtom.buffer);
+        rView.setUint32(0, rtngAtom.length);
+        rView.setUint8(4, 'r'.charCodeAt(0));
+        rView.setUint8(5, 't'.charCodeAt(1));
+        rView.setUint8(6, 'n'.charCodeAt(2));
+        rView.setUint8(7, 'g'.charCodeAt(3));
+        
+        rView.setUint32(8, 9);
+        rView.setUint8(12, 'd'.charCodeAt(0));
+        rView.setUint8(13, 'a'.charCodeAt(0));
+        rView.setUint8(14, 't'.charCodeAt(0));
+        rView.setUint8(15, 'a'.charCodeAt(0));
+        
+        // Set explicit marker byte flag inside container structure array
+        rtngAtom[16] = 21; // Type Indicator: Unsigned Integer data byte
+        rtngAtom[24] = 1;  // ITUNESADVISORY Parameter Set Explicit
+        metaAtoms.push(rtngAtom);
+      }
+
+      let totalMetaSize = metaAtoms.reduce((acc, atom) => acc + atom.length, 0);
+      const prefixHeaderSize = 8 + 4 + 8 + 8; // udta + meta + hdlr
+      const ilstHeaderSize = 8;
+      
+      const finalWrapper = new Uint8Array(prefixHeaderSize + ilstHeaderSize + totalMetaSize);
+      const wView = new DataView(finalWrapper.buffer);
+      
+      // Form structural udta container atoms
+      wView.setUint32(0, finalWrapper.length);
+      wView.setUint8(4, 'u'.charCodeAt(0)); wView.setUint8(5, 'd'.charCodeAt(1)); wView.setUint8(6, 't'.charCodeAt(2)); wView.setUint8(7, 'a'.charCodeAt(3));
+      
+      // Form metadata indexing atoms
+      wView.setUint32(8, finalWrapper.length - 8);
+      wView.setUint8(12, 'm'.charCodeAt(0)); wView.setUint8(13, 'e'.charCodeAt(1)); wView.setUint8(14, 't'.charCodeAt(2)); wView.setUint8(15, 'a'.charCodeAt(3));
+      wView.setUint32(16, 0); // Clear flag arrays
+      
+      // Map cross-platform iTunes compatibility definitions
+      wView.setUint32(20, 12);
+      wView.setUint8(24, 'h'.charCodeAt(0)); wView.setUint8(25, 'd'.charCodeAt(1)); wView.setUint8(26, 'l'.charCodeAt(2)); wView.setUint8(27, 'r'.charCodeAt(3));
+      
+      // Setup detailed indexing lists
+      wView.setUint32(28, finalWrapper.length - 28);
+      wView.setUint8(32, 'i'.charCodeAt(0)); wView.setUint8(33, 'l'.charCodeAt(1)); wView.setUint8(34, 's'.charCodeAt(2)); wView.setUint8(35, 't'.charCodeAt(3));
+
+      let currentOffset = 36;
+      metaAtoms.forEach(atom => {
+        finalWrapper.set(atom, currentOffset);
+        currentOffset += atom.length;
+      });
+
+      // Construct a new unified file buffer including the combined audio metadata
+      const combinedOutput = new Uint8Array(uint8.length + finalWrapper.length);
+      combinedOutput.set(uint8, 0);
+      combinedOutput.set(finalWrapper, uint8.length);
+
+      return new Blob([combinedOutput], { type: 'audio/m4a' });
     }
   </script>
 </body>
