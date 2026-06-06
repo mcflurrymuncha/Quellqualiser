@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUELLQUALISER // PRODUCTION STUDIO</title>
+  <title>Quellqualiser/title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.all.min.js"></script>
   
   <style>
@@ -248,9 +248,9 @@
   <div class="nav-bar">
     <div>
       <span class="status-dot"></span>
-      <span class="brand-title">QUELLQUALISER DIGITAL AUDIO CONSOLE</span>
+      <span class="brand-title">QUELLQUALISER: Quellqa, but web!</span>
     </div>
-    <div class="subtitle">Pure Client-Side Audio Engine</div>
+    <div class="subtitle">v3.0.0</div>
   </div>
 
   <div class="workspace">
@@ -308,7 +308,7 @@
 
       <div class="card" style="margin-top: auto;">
         <div class="control-row">
-          <span>INPUT PRE-AMPLIFIER (GAIN)</span>
+          <span>PRE-AMP (GAIN)</span>
           <span id="label-preamp" class="value-display">0.0 dB</span>
         </div>
         <input type="range" id="slider-preamp" min="-12" max="12" step="0.5" value="0" class="horizontal">
@@ -344,8 +344,8 @@
   </div>
 
   <div class="system-status-bar">
-    <span>Hardware Status: Active Digital Signal Processing</span>
-    <span id="status-logger" style="color: #a1a1aa;">WAITING FOR USER SOURCE INGESTION</span>
+    <span>Your Files only stay on your Computer, Nothing is sent to a Server.</span>
+    <span id="status-logger" style="color: #a1a1aa;">Waiting for File Upload</span>
   </div>
 
   <script>
@@ -468,8 +468,8 @@
       audioSourceNode.start(0, startTimeOffset);
       timestampToCalculateOffset = audioContext.currentTime;
       isPlaying = true;
-      btnPlay.innerText = "Pause Preview";
-      statusLogger.innerText = "LIVE SIGNAL STREAMING ACTIVE";
+      btnPlay.innerText = "Pause";
+      statusLogger.innerText = "Preview Playing";
     }
 
     function pausePreviewTrack() {
@@ -477,14 +477,14 @@
       isPlaying = false;
       audioSourceNode.stop();
       startTimeOffset += (audioContext.currentTime - timestampToCalculateOffset) * playbackRateValue;
-      btnPlay.innerText = "Play Preview";
-      statusLogger.innerText = "PREVIEW PAUSED";
+      btnPlay.innerText = "Play";
+      statusLogger.innerText = "Preview Paused";
     }
 
     function stopPreviewTrack() {
       if (audioSourceNode) { try { audioSourceNode.stop(); } catch(e){} }
       isPlaying = false;
-      btnPlay.innerText = "Play Preview";
+      btnPlay.innerText = "Play";
     }
 
     document.getElementById('slider-pitch').addEventListener('input', (e) => {
@@ -561,7 +561,7 @@
     btnDownload.addEventListener('click', async () => {
       if (!audioBuffer || !currentFile) return;
 
-      statusLogger.innerText = "RENDERING DSP HARMONICS TO OFFLINE THREAD...";
+      statusLogger.innerText = "Compiling MP3 File";
       btnDownload.disabled = true;
       btnDownload.innerText = "Processing...";
 
@@ -597,7 +597,7 @@
 
       try {
         const renderedBuffer = await offlineCtx.startRendering();
-        statusLogger.innerText = "ENCODING STREAM DIRECTLY INTO MP3 ALGORITHMS...";
+        statusLogger.innerText = "Encoding";
         
         const mp3Blob = encodeAudioBufferToMp3(renderedBuffer);
         const downloadUrl = URL.createObjectURL(mp3Blob);
@@ -611,10 +611,10 @@
         
         document.body.removeChild(anchor);
         URL.revokeObjectURL(downloadUrl);
-        statusLogger.innerText = "MP3 COMPILATION PIPELINE EXPORT SUCCESSFUL";
+        statusLogger.innerText = "MP3 Downloaded!";
       } catch (err) {
         console.error(err);
-        statusLogger.innerText = "EXPORT EXCEPTION DETECTED";
+        statusLogger.innerText = "Error While Compiling MP3!";
       } finally {
         btnDownload.disabled = false;
         btnDownload.innerText = "Render As MP3 File";
